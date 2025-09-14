@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader Mahi - Trading Platform</title>
+    <style>
+        /* Updated CSS variables with new color scheme */
+        :root {
+            --background: #0a0e1a;
+            --foreground: #ffffff;
+            --card: rgba(26, 32, 53, 0.8);
+            --card-foreground: #ffffff;
+            --primary: #4a6cf7;
+            --primary-foreground: #ffffff;
+            --secondary: rgba(26, 32, 53, 0.5);
+            --secondary-foreground: #b0b8d8;
+            --muted: rgba(26, 32, 53, 0.3);
+            --muted-foreground: #b0b8d8;
+            --accent: #ff6b6b;
+            --accent-foreground: #ffffff;
+            --border: rgba(176, 184, 216, 0.2);
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* iOS-style utilities */
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .ios-shadow {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            background: #3a5ce5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 108, 247, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--muted);
+        }
+
+        .btn-red {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: #ff3333;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 77, 77, 0.3);
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 14, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-foreground);
+            font-weight: bold;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--foreground);
+            z-index: 101;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: var(--foreground);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover {
+            background: var(--muted);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--muted-foreground);
+            margin-bottom: 2rem;
+            max-width: 48rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-avatar {
+            width: 8rem;
+            height: 8rem;
+            border-radius: 50%;
+            margin: 0 auto 2rem auto;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            animation: rotateBorder 3s linear infinite;
+        }
+
+        @keyframes rotateBorder {
+            0% { box-shadow: 0 0 0 0 rgba(74, 108, 247, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(74, 108, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 108, 247, 0); }
+        }
+
+        /* Animations */
+        .wave-animation {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            box-shadow: 0 4px 15px rgba(74, 108, 247, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .wave-animation::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: slowWave 4s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        .wave-animation::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: slowWave 4s ease-in-out infinite 2s;
+            z-index: 1;
+        }
+
+        @keyframes slowWave {
+            0% { left: -100%; opacity: 0; }
+            20% { opacity: 0.8; }
+            50% { opacity: 1; }
+            80% { opacity: 0.8; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        .shine-animation {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-animation::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Floating animation */
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-muted {
+            background: rgba(26, 32, 53, 0.3);
+        }
+
+        /* Stats cards */
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            animation: float 4s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 1rem 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--muted-foreground);
+        }
+
+        /* Broker cards */
+        .broker-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .broker-card:hover {
+            transform: scale(1.05);
+        }
+
+        .broker-logo-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .broker-logo {
+            height: 3rem;
+            width: auto;
+            border-radius: 0.75rem;
+            object-fit: contain;
+        }
+
+        .broker-name-overlay {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(74, 108, 247, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .broker-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .broker-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        /* Tool cards */
+        .tool-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .tool-card:hover {
+            transform: scale(1.05);
+        }
+
+        .tool-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem auto;
+            background: rgba(74, 108, 247, 0.1);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        /* Review cards */
+        .review-card {
+            background: var(--card);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .review-card:hover {
+            transform: scale(1.05);
+        }
+
+        .review-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--muted);
+        }
+
+        .review-content {
+            padding: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(26, 32, 53, 0.5);
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-profile {
+            max-width: 20rem;
+            margin: 0 auto 2rem auto;
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-avatar {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 50%;
+            margin: 0 auto 1rem auto;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            animation: rotateBorder 3s linear infinite;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-text {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            line-height: 1.5;
+        }
+
+        /* Video Preview Styles */
+        .video-preview {
+            position: relative;
+            aspect-ratio: 16/9;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            background: var(--muted);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 0, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .video-play-button:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-play-button svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+            margin-left: 4px;
+        }
+
+        .video-info {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .video-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-channel {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .youtube-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.5rem;
+        }
+
+        /* Background elements */
+        .gradient-glow{
+            position:fixed; 
+            inset:-30vmax; 
+            pointer-events:none; 
+            filter: blur(100px);
+            background: radial-gradient(50vmax 50vmax at 25% 25%, rgba(74,108,247,.15), transparent 60%),
+                        radial-gradient(40vmax 40vmax at 75% 30%, rgba(121, 40, 202, 0.15), transparent 60%),
+                        radial-gradient(45vmax 45vmax at 45% 80%, rgba(255,107,107,.12), transparent 60%);
+            animation: drift 35s linear infinite alternate;
+            z-index: 0;
+        }
+        
+        @keyframes drift{
+            to{transform: translate3d(2rem,-2rem,0) rotate(1deg)}
+        }
+
+        .grid-overlay{
+            position:fixed; 
+            inset:0; 
+            pointer-events:none; 
+            opacity:.15;
+            background-image:
+                linear-gradient(to right, transparent 0 1px, var(--grid) 1px 2px, transparent 2px 100%),
+                linear-gradient(to bottom, transparent 0 1px, var(--grid) 1px 2px, transparent 2px 100%);
+            background-size: 50px 50px, 50px 50px;
+            z-index: 0;
+            --grid: rgba(176, 184, 216, 0.2);
+        }
+
+        .noise{
+            position:fixed; 
+            inset:0; 
+            pointer-events:none; 
+            opacity:.03; 
+            background:
+            url('data:image/svg+xml;utf8,\
+            <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">\
+                <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3"/></filter>\
+                <rect width="极速电竞" height="100%" filter="url(%23n)" opacity="0.8"/>\
+            </svg>') repeat; 
+            mix-blend-mode: overlay;
+            z-index: 1;
+        }
+
+        /* Mobile menu blur overlay */
+        .blur-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(10, 14, 26, 0.5);
+            z-index: 98;
+        }
+        
+        .blur-overlay.active {
+            display: block;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(10, 14, 26, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 5rem 1rem 1rem;
+                border-bottom: 1px solid var(--border);
+                z-index: 99;
+            }
+
+            .nav.active {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            @media (min-width: 640px) {
+                .grid-2 {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (min-width: 768px) {
+                .grid-3 {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .grid-4 {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (min-width: 1024px) {
+                .grid-3 {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+                .grid-4 {
+                    grid-template-columns: repeat(4, 1fr);
+                }
+            }
+        }
+
+        /* Hidden sections for single page navigation */
+        .section-hidden {
+            display: none;
+        }
+
+        .section-visible {
+            display: block;
+        }
+
+        /* Overlay for closing mobile menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 97;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="gradient-glow"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise"></div>
+    
+    <!-- Blur overlay for mobile menu -->
+    <div class="blur-overlay" id="blurOverlay"></div>
+    
+    <!-- Overlay for closing mobile menu -->
+    <div class="overlay" id="overlay" onclick="closeMenu()"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" onclick="showSection('home')">
+                    <div class="logo-icon">MT</div>
+                    <span style="font-weight: bold; font-size: 1.25rem;">Trader Mahi</span>
+                </div>
+                <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+                <nav class="nav" id="nav">
+                    <a href="#" onclick="showSection('home')">Home</a>
+                    <a href="#" onclick="showSection('reviews')">Reviews</a>
+                    <a href="https://t.me/MahiTrader07" target="_blank" class="btn btn-primary">Join Channel</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Home Section -->
+    <div id="home-section" class="section-visible">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <img src="https://i.ibb.co/84dwMB4z/image.jpg" alt="Trader Mahi" class="hero-avatar">
+                <h1>Welcome To Trader Mahi Community</h1>
+                <p>Join The MT Community Learn With MT & Earn With MT Build Trading Career With Trader Mahi</p>
+                <a href="https://t.me/MahiTrader07" target="_blank" class="btn btn-primary wave-animation floating">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 0.5rem;">
+                        <path d="M12 0C5.374 0 0 5.373 0 12s5.374 12 12 12 12-5.373 12-12S18.626 0 12 0zm5.568 8.16l-1.61 7.59c-.12.54-.44.67-.89.42l-2.46-1.82-1.19 1.14c-.13.13-.24.24-.49.24l.17-2.49 4.54-4.1c.2-.18-.04-.28-.31-.1L9.39 13.17l-2.44-.76c-.53-.17-.54-.53.11-.78l9.52-3.67c.44-.17.83.11.69.78z"/>
+                    </svg>
+                    Join Our Channel
+                </a>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="section">
+            <div class="container">
+                <div class="card" style="text-align: center;">
+                    <p style="font-size: 1.125rem; margin-bottom: 1.5rem; color: var(--muted-foreground);">
+                        For Live Session, Future Signal, Bot Signal, Free Live Class, Free Course A TO Z, Full Guideline
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                        <a href="http://https://broker-qx.pro/?lid=632350" target="_blank" class="btn btn-primary shine-animation">Create Quotex Account</a>
+                        <a href="https://t.me/MT_Support_RoBot" target="_blank" class="btn btn-outline">
+                            Want To Join Vip Click Here
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="section">
+            <div class="container">
+                <div class="grid grid-2" style="max-width: 32rem; margin: 0 auto;">
+                    <div class="stat-card">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary);">
+                            <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 极速电竞 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                        </svg>
+                        <div class="stat-number">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary);">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            40 To 50k
+                        </div>
+                        <div class="stat-label">Monthly Earn</div>
+                    </div>
+                    <div class="stat-card">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--accent);">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <div class="stat-number">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="current极速电竞" style="color: var(--accent);">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            5 Years
+                        </div>
+                        <div class="stat-label">Expert Trader</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Learning Section -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Learn & Know About Trading</h2>
+                <div class="grid grid-3" id="videos-container">
+                    <!-- Videos will be loaded here -->
+                </div>
+                
+                <!-- Trading Tools Section -->
+                <div style="margin-top: 4rem;">
+                    <h2 class="section-title">Trading Tools</h2>
+                    <div class="grid grid-3">
+                        <div class="tool-card">
+                            <div class="tool-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 3V18H12V3H9M12 5L16 18L19 17L15 4L12 5M5 5V18H8V5H5M3 19V21H21V19H3Z"/>
+                                </svg>
+                            </div>
+                            <h3>MT Calculator</h3>
+                            <p style="color: var(--muted-foreground); margin: 1rem 0;">Advanced trading calculator for precise position sizing and risk management</p>
+                            <a href="https://v0-mt-smart-calcu.vercel.app/" target="_blank" class="btn btn-primary shine-animation" style="width: 100%;">
+                                Open Calculator
+                            </a>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19,4H17V3H15V4H9V3H7V4H5C3.89,4 3,4.9 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8M12,13H17V18H12V13Z"/>
+                                </svg>
+                            </div>
+                            <h3>Forex Smart Calculator</h3>
+                            <p style="color: var(--muted-foreground); margin: 1rem 0;">In Forex Smart Calculator,You Will Get Every Advance Forex Tools</p>
+                            <a href="https://v0-mt-smart-calcu.vercel.app/" target="_blank" class="btn btn-primary shine-animation" style="width: 100%;">
+                                Open Calculator
+                            </a>
+                        </div>
+                        <div class="tool-card">
+                            <div class="tool-icon">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"/>
+                                </svg>
+                            </div>
+                            <h3>Binary Smart Calculator</h3>
+                            <p style="color: var(--muted-foreground); margin: 1rem 0;">In Binary Calculator , You Will Get Every Binary Smart Tools</p>
+                            <a href="https://v0-mt-smart-calcu.vercel.app/" target="_blank" class="btn btn-primary shine-animation" style="width: 100%;">
+                                Open Calculator
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Broker Section -->
+        <section class="section section-muted">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h2 class="section-title">Open Your Trading Account Today</h2>
+                    <p style="font-size: 1.125rem; color: var(--muted-foreground); max-width: 32rem; margin: 0 auto;">
+                        Choose the perfect trading platform based on your investment level and trading style
+                    </p>
+                </div>
+                <div class="grid grid-4" id="brokers-container">
+                    <!-- Brokers will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div id="reviews-section" class="section-hidden">
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Student Reviews</h2>
+                <div class="grid grid-4" id="reviews-container">
+                    <!-- Reviews will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-profile">
+                <img src="https://i.ibb.co/84dwMB4z/image.jpg" alt="Trader Mahi" class="footer-avatar">
+                <a href="https://t.me/tradermahi" target="_blank" class="btn btn-primary shine-animation" style="width: 100%;">Contact Owner</a>
+            </div>
+            <div class="footer-links">
+                <a href="#" onclick="showSection('reviews')" class="btn btn-outline">See Reviews</a>
+                <a href="https://t.me/MahiTrader07" target="_blank" class="btn btn-primary">Join Our Channel</a>
+            </div>
+            <div class="footer-text">
+                <p>Trading in financial markets is highly risky. Don't invest money you can't afford to lose.</p>
+                <p>© 2025 Trader Mahi - All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Firebase SDK imports -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+        apiKey: "AIzaSyCio8Bxd4Dbte0ov6Ym47Ns-oWdstM3Uoo",
+        authDomain: "trader-mahi---com.firebaseapp.com",
+        databaseURL: "https://trader-mahi---com-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "trader-mahi---com",
+        storageBucket: "trader-mahi---com.firebasestorage.app",
+        messagingSenderId: "1050234776548",
+        appId: "1:1050234776548:web:718a1769c205099777f5f1",
+        };
+    
+        let database = null;
+        let isFirebaseInitialized = false;
+    
+        function initializeFirebase() {
+            try {
+                console.log('[v0] Attempting Firebase initialization...');
+                    
+                if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                    database = firebase.database();
+                    isFirebaseInitialized = true;
+                        
+                    console.log('[v0] Firebase initialized successfully');
+                    console.log('[v0] Database available:', !!database);
+                        
+                    setupRealtimeListeners();
+                    return true;
+                } else if (firebase.apps.length > 0) {
+                    database = firebase.database();
+                    isFirebaseInitialized = true;
+                    console.log('[v0] Firebase already initialized');
+                    setupRealtimeListeners();
+                    return true;
+                } else {
+                    console.log('[v0] Firebase SDK not loaded');
+                    return false;
+                }
+            } catch (error) {
+                console.error('[v0] Firebase initialization failed:', error);
+                return false;
+            }
+        }
+    
+        function formatFirebaseData(snapshot) {
+            const data = snapshot.val();
+            if (!data) return [];
+                
+            return Object.keys(data).map(key => {
+                const item = data[key];
+                if (item && typeof item === 'object') {
+                    item.id = key;
+                }
+                return item;
+            }).filter(item => item !== null);
+        }
+    
+        function setupRealtimeListeners() {
+            if (!database) {
+                console.log('[v0] Database not available for listeners');
+                return;
+            }
+    
+            console.log('[v0] Setting up Firebase real-time listeners');
+    
+            // Listen for videos changes
+            database.ref('videos').on('value', (snapshot) => {
+                console.log('[v0] Videos data received:', snapshot.val());
+                const videosArray = formatFirebaseData(snapshot);
+                updateVideosDisplay(videosArray);
+            }, (error) => {
+                console.error('[v0] Error listening to videos:', error);
+                updateVideosDisplay([]);
+            });
+    
+            // Listen for brokers changes
+            database.ref('brokers').on('value', (snapshot) => {
+                console.log('[v0] Brokers data received:', snapshot.val());
+                const brokersArray = formatFirebaseData(snapshot);
+                updateBrokersDisplay(brokersArray);
+            }, (error) => {
+                console.error('[v0] Error listening to brokers:', error);
+                updateBrokersDisplay([]);
+            });
+    
+            // Listen for reviews changes
+            database.ref('reviews').on('value', (snapshot) => {
+                console.log('[v0] Reviews data received:', snapshot.val());
+                const reviewsArray = formatFirebaseData(snapshot);
+                updateReviewsDisplay(reviewsArray);
+            }, (error) => {
+                console.error('[v0] Error listening to reviews:', error);
+                updateReviewsDisplay([]);
+            });
+        }
+    
+        function getYouTubeVideoId(url) {
+            if (!url) return null;
+                
+            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[7].length === 11) ? match[7] : null;
+        }
+    
+        function updateVideosDisplay(videos) {
+            const container = document.getElementById('videos-container');
+            if (!container) return;
+                
+            if (videos.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary); margin-bottom: 1rem;">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <h3 style="margin-bottom: 0.5rem;">No Videos Available</h3>
+                        <p style="color: var(--muted-foreground);">Videos will appear here when added from admin panel.</p>
+                    </div>
+                `;
+                return;
+            }
+                
+            container.innerHTML = videos.map(video => {
+                const videoId = getYouTubeVideoId(video.youtubeUrl);
+                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+                    
+                return `
+                <div class="card">
+                    <div class="video-preview" onclick="openVideoModal('${video.youtubeUrl}')">
+                        ${thumbnailUrl ? `
+                            <img src="${thumbnailUrl}" alt="${video.title || 'Video thumbnail'}" class="video-thumbnail">
+                            <div class="video-play-button">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">${video.title || 'Untitled Video'}</div>
+                                <div class="video-channel">Trader Mahi</div>
+                            </div>
+                        ` : `
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary);">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                        `}
+                    </div>
+                    <a href="${video.buttonLink || '#'}" target="_blank" class="btn btn-red shine-animation" style="width: 100%;">
+                        <svg class="youtube-icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                        </svg>
+                        Watch on YouTube
+                    </a>
+                </div>
+                `;
+            }).join('');
+        }
+    
+        function updateBrokersDisplay(brokers) {
+            const container = document.getElementById('brokers-container');
+            if (!container) return;
+                
+            if (brokers.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary); margin-bottom: 1rem;">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <h3 style="margin-bottom: 0.5rem;">No Brokers Available</h3>
+                        <p style="color: var(--muted-foreground);">Brokers will appear here when added from admin panel.</p>
+                    </div>
+                `;
+                return;
+            }
+                
+            container.innerHTML = brokers.map(broker => {
+                if (broker.isActive && broker.name) {
+                    return `
+                        <div class="broker-card">
+                            <div class="broker-logo-container">
+                                <img src="${broker.logo || ''}" alt="${broker.name} logo" class="broker-logo" onerror="this.style.display='none'">
+                                <div class="broker-name-overlay">${broker.name}</div>
+                            </div>
+                            <ul class="broker-features">
+                                ${(broker.features || []).map(feature => `
+                                    <li>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary);">
+                                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                        </svg>
+                                        ${feature}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <a href="${broker.signUpLink || '#'}" target="_blank" class="btn btn-primary shine-animation" style="width: 100%;">
+                                Sign Now
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="broker-card">
+                            <div style="padding: 2rem 0;">
+                                <div style="width: 4rem; height: 4rem; background: var(--muted); border-radius: 0.75rem; margin: 0 auto 1rem auto; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="color: var(--muted-foreground);">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8极速电竞-9 9z"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-weight: bold; font-size: 1.125rem; margin-bottom: 0.5rem;">Not Selected</h3>
+                                <div style="background: #fef3c7; color: #92400e; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h7v2zm0-4h-2v-4h10v4zm0-4H7V7h10v2z"/>
+                                    </svg>
+                                    No Link Set
+                                </div>
+                                <button class="btn btn-outline" style="width: 100%;" disabled>Sign Now</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+    
+        function updateReviewsDisplay(reviews) {
+            const container = document.getElementById('reviews-container');
+            if (!container) return;
+                
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color: var(--primary); margin-bottom: 1rem;">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <h3 style="margin-bottom: 0.5rem;">No Reviews Available</h3>
+                        <p style="color: var(--muted-foreground);">Reviews will appear here when added from admin panel.</p>
+                    </div>
+                `;
+                return;
+            }
+                
+            container.innerHTML = reviews.map(review => `
+                <div class="review-card">
+                    <img src="${review.image || ''}" alt="Review" class="review-image" onerror="this.style.display='none'">
+                    <div class="review-content">
+                        <a href="${review.reviewLink || '#'}" target="_blank" class="btn btn-outline" style="width: 100%; margin-bottom: 0.5rem;">
+                            See/Watch Review
+                        </a>
+                        <a href="https://t.me/MahiTrader07" target="_blank" class="btn btn-primary wave-animation" style="width: 100%;">
+                            Join Our Channel
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+    
+        // Navigation functions
+        function toggleMenu() {
+            const nav = document.getElementById('nav');
+            const overlay = document.getElementById('overlay');
+            const blurOverlay = document.getElementById('blurOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+                
+            nav.classList.toggle('active');
+            overlay.classList.toggle('active');
+            blurOverlay.classList.toggle('active');
+                
+            if (nav.classList.contains('active')) {
+                menuToggle.innerHTML = '✕';
+            } else {
+                menuToggle.innerHTML = '☰';
+            }
+        }
+    
+        function closeMenu() {
+            const nav = document.getElementById('nav');
+            const overlay = document.getElementById('overlay');
+            const blurOverlay = document.getElementById('blurOverlay');
+            const menuToggle = document.getElementById('menuToggle');
+                
+            nav.classList.remove('active');
+            overlay.classList.remove('active');
+            blurOverlay.classList.remove('active');
+            menuToggle.innerHTML = '☰';
+        }
+    
+        function showSection(section) {
+            // Hide all sections
+            document.getElementById('home-section').className = 'section-hidden';
+            document.getElementById('reviews-section').className = 'section-hidden';
+                
+            // Show selected section
+            if (section === 'home') {
+                document.getElementById('home-section').className = 'section-visible';
+            } else if (section === 'reviews') {
+                document.getElementById('reviews-section').className = 'section-visible';
+            }
+                
+            // Close mobile menu
+            closeMenu();
+        }
+    
+        function openVideoModal(youtubeUrl) {
+            if (youtubeUrl) {
+                // Extract video ID from YouTube URL
+                const videoId = getYouTubeVideoId(youtubeUrl);
+                    
+                if (videoId) {
+                    const modalHtml = `
+                        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center;" onclick="closeVideoModal()">
+                            <div style="position: relative; width: 90%; max-width: 800px; background: #000; border-radius: 8px; overflow: hidden;" onclick="event.stopPropagation()">
+                                <button style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; z-index: 1001;">✕</button>
+                                <iframe width="100%" height="450" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    `;
+                        
+                    const modalDiv = document.createElement('div');
+                    modalDiv.innerHTML = modalHtml;
+                    modalDiv.id = 'video-modal';
+                    document.body.appendChild(modalDiv);
+                }
+            }
+        }
+    
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+        }
+    
+        function initializeApp() {
+            console.log('[v0] Initializing app...');
+            const firebaseInitialized = initializeFirebase();
+                
+            if (!firebaseInitialized) {
+                console.log('[v0] Firebase not available, showing empty states');
+                updateVideosDisplay([]);
+                updateBrokersDisplay([]);
+                updateReviewsDisplay([]);
+            }
+        }
+    
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

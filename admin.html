@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader Mahi - Admin Panel</title>
+    <style>
+        /* Updated CSS variables with new color scheme */
+        :root {
+            --background: #0a0e1a;
+            --foreground: #ffffff;
+            --card: rgba(26, 32, 53, 0.8);
+            --card-foreground: #ffffff;
+            --primary: #4a6cf7;
+            --primary-foreground: #ffffff;
+            --secondary: rgba(26, 32, 53, 0.5);
+            --secondary-foreground: #b0b8d8;
+            --muted: rgba(26, 32, 53, 0.3);
+            --muted-foreground: #b0b8d8;
+            --accent: #ff6b6b;
+            --accent-foreground: #ffffff;
+            --border: rgba(176, 184, 216, 0.2);
+            --destructive: #dc2626;
+            --destructive-foreground: #ffffff;
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .btn-primary:hover {
+            background: #3a5ce5;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--muted);
+        }
+
+        .btn-destructive {
+            background: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .btn-destructive:hover {
+            background: #b91c1c;
+        }
+
+        .input, .textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            background: rgba(26, 32, 53, 0.5);
+            color: var(--foreground);
+            font-size: 0.875rem;
+        }
+
+        .textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-secondary {
+            background: var(--secondary);
+            color: var(--secondary-foreground);
+        }
+
+        .badge-outline {
+            background: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 0;
+            backdrop-filter: blur(10px);
+            display: none; /* Initially hidden */
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-foreground);
+            font-weight: bold;
+        }
+
+        /* Tabs */
+        .tabs {
+            margin-bottom: 2rem;
+        }
+
+        .tabs-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: var(--muted);
+            border-radius: 1rem;
+            padding: 0.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-trigger {
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: var(--muted-foreground);
+        }
+
+        .tab-trigger.active {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 32rem;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Section headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Item cards */
+        .item-card {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .item-content {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        /* Background elements */
+        .gradient-glow{
+            position:fixed; 
+            inset:-30vmax; 
+            pointer-events:none; 
+            filter: blur(100px);
+            background: radial-gradient(50vmax 50vmax at 25% 25%, rgba(74,108,247,.15), transparent 60%),
+                        radial-gradient(40vmax 40vmax at 75% 30%, rgba(121, 40, 202, 0.15), transparent 60%),
+                        radial-gradient(45vmax 45vmax at 45% 80%, rgba(255,107,107,.12), transparent 60%);
+            animation: drift 35s linear infinite alternate;
+            z-index: -1;
+        }
+        
+        @keyframes drift{
+            to{transform: translate3d(2rem,-2rem,0) rotate(1deg)}
+        }
+
+        .grid-overlay{
+            position:fixed; 
+            inset:0; 
+            pointer-events:none; 
+            opacity:.15;
+            background-image:
+                linear-gradient(to right, transparent 极速电竞 1px, var(--grid) 1px 2px, transparent 2px 100%),
+                linear-gradient(to bottom, transparent 0 1极速电竞, var(--grid) 1px 2px, transparent 2px 100%);
+            background-size: 50px 50px, 50px 50px;
+            z-index: -1;
+            --grid: rgba(176, 184, 216, 0.2);
+        }
+
+        .noise{
+            position:fixed; 
+            inset:0; 
+            pointer-events:none; 
+            opacity:.03; 
+            background:
+            url('data:image/svg+xml;utf8,\
+            <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">\
+                <filter id="n"><feTurbulence type极速电竞"fractalNoise" baseFrequency="0.6" numOctaves="3"/></filter>\
+                <rect width="100%" height="100%" filter="url(%23n)" opacity="0.8"/>\
+            </svg>') repeat; 
+            mix-blend-mode: overlay;
+            z-index: -1;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+
+        @media (min-width: 640px) {
+            .grid-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .tabs-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .grid-4 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="gradient-glow"></div>
+    <div class="grid-overlay"></div>
+    <div class="noise"></div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal active">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Admin Login</h3>
+            </div>
+            <form id="login-form">
+                <div class极速电竞"form-group">
+                    <label class="label">Username</label>
+                    <input type="text" class="input" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label class="label">Password</label>
+                    <input type="password" class="input" id="password" placeholder="Enter password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+                <p id="login-error" style="color: var(--accent); text-align: center; margin-top: 1rem; display: none;">
+                    Invalid credentials. Please try again.
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">TM</div>
+                    <div>
+                        <h1 style="font-size: 1.5rem; font-weight: bold;">Trader Mahi</h1>
+                        <p style="font-size: 0.875rem; color: var(--muted-foreground);">Admin Panel</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="index.html" class="btn btn-outline" style="margin-right: 10px;">
+                        View Site
+                    </a>
+                    <button class="btn btn-destructive" onclick="logout()">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: 2rem 1rem; display: none;">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" onclick="showTab('videos')">Videos</button>
+                <button class="tab-trigger" onclick="showTab('brokers')">Brokers</button>
+                <button class="tab-trigger" onclick="showTab('reviews')">Reviews</button>
+            </div>
+
+            <!-- Videos Tab -->
+            <div id="videos-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2 class="section-title">Learn & Know Videos</h2>
+                    <button class="btn btn-primary" onclick="openModal('video')">
+                        ➕ Add Video
+                    </button>
+                </div>
+                <div id="videos-container" class="grid">
+                    <!-- Videos will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Brokers Tab -->
+            <div id="brokers-tab" class="tab-content">
+                <div class="section-header">
+                    <h2 class="section-title">Broker Management</h2>
+                    <span class="badge badge-secondary">Max 4 Brokers</span>
+                </div>
+                <div id="brokers-container" class="grid grid-2">
+                    <!-- Brokers will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Reviews Tab -->
+            <div id="reviews-tab" class="tab-content">
+                <div class="section-header">
+                    <h2 class="section-title">Review Management</h2>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="badge badge-secondary">Max 30 Reviews</span>
+                        <button class="btn btn-primary" onclick="openModal('review')">
+                            ➕ Add Review
+                        </button>
+                    </div>
+                </div>
+                <div id="reviews-container" class="grid grid-4">
+                    <!-- Reviews will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="modal-title">Add Item</h3>
+            </div>
+            <form id="modal-form">
+                <div id="form-fields">
+                    <!-- Form fields will be dynamically generated -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">
+                        ❌ Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        💾 Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK imports -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Check if user is already logged in
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('traderMahiAdminLoggedIn');
+            if (isLoggedIn === 'true') {
+                document.getElementById('login-modal').classList.remove('active');
+                document.querySelector('.header').style.display = 'block';
+                document.querySelector('main').style.display = 'block';
+                initializeFirebase();
+            }
+        }
+
+        // Login functionality
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('login-error');
+            
+            if (username === 'TM' && password === 'MAHI') {
+                // Successful login
+                localStorage.setItem('traderMahiAdminLoggedIn', 'true');
+                document.getElementById('login-modal').classList.remove('active');
+                document.querySelector('.header').style.display = 'block';
+                document.querySelector('main').style.display = 'block';
+                
+                // Initialize Firebase and load data
+                initializeFirebase();
+            } else {
+                // Show error
+                errorElement.style.display = 'block';
+            }
+        });
+        
+        function logout() {
+            localStorage.removeItem('traderMahiAdminLoggedIn');
+            document.getElementById('login-modal').classList.add('active');
+            document.querySelector('.header').style.display = 'none';
+            document.querySelector('main').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyCio8Bxd4Dbte0ov6Ym47Ns-oWdstM3Uoo",
+  authDomain: "trader-mahi---com.firebaseapp.com",
+  databaseURL: "https://trader-mahi---com-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "trader-mahi---com",
+  storageBucket: "trader-mahi---com.firebasestorage.app",
+  messagingSenderId: "1050234776548",
+  appId: "1:1050234776548:web:718a1769c205099777f5f1"
+        };
+
+        let database = null;
+        let isFirebaseInitialized = false;
+
+        // Initialize Firebase
+        function initializeFirebase() {
+            try {
+                console.log('[v0] Attempting Firebase initialization...');
+                
+                if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                    database = firebase.database();
+                    isFirebaseInitialized = true;
+                    
+                    console.log('[v0] Firebase initialized successfully');
+                    console.log('[v0] Database available:', !!database);
+                    
+                    loadFirebaseData();
+                    return true;
+                } else if (firebase.apps.length > 0) {
+                    database = firebase.database();
+                    isFirebaseInitialized = true;
+                    console.log('[v0] Firebase already initialized');
+                    loadFirebaseData();
+                    return true;
+                } else {
+                    console.error('[v0] Firebase SDK not loaded');
+                    return false;
+                }
+            } catch (error) {
+                console.error('[v0极速电竞] Firebase initialization failed:', error);
+                return false;
+            }
+        }
+
+        function formatFirebaseData(snapshot) {
+            const data = snapshot.val();
+            if (!data) return [];
+            
+            return Object.keys(data).map(key => {
+                const item = data[key];
+                if (item && typeof item === 'object') {
+                    item.id = key;
+                }
+                return item;
+            }).filter(item => item !== null);
+        }
+
+        function loadFirebaseData() {
+            if (!database) {
+                console.log('[v0] Database not available, showing empty states');
+                data = {
+                    videos: [],
+                    brokers: [],
+                    reviews: []
+                };
+                loadVideos();
+                return;
+            }
+
+            console.log('[v0] Loading data from Firebase');
+
+            // Load videos
+            database.ref('videos').on('value', (snapshot) => {
+                const firebaseData = snapshot.val();
+                console.log('[v0] Videos loaded:', firebaseData);
+                data.videos = formatFirebaseData(snapshot);
+                loadVideos();
+            }, (error) => {
+                console.error('[v0] Error loading videos:', error);
+                data.videos = [];
+                loadVideos();
+            });
+
+            // Load brokers
+            database.ref('brokers').on('value', (snapshot) => {
+                const firebaseData = snapshot.val();
+                console.log('[v0] Brokers loaded:', firebaseData);
+                data.brokers = formatFirebaseData(snapshot);
+                loadBrokers();
+            }, (error) => {
+                console.error('[v0] Error loading brokers:', error);
+                data.brokers = [];
+                loadBrokers();
+            });
+
+            // Load reviews
+            database.ref('reviews').on('value', (snapshot) => {
+                const firebaseData = snapshot.val();
+                console.log('[v0] Reviews loaded:', firebaseData);
+                data.reviews = formatFirebaseData(snapshot);
+                loadReviews();
+            }, (error) => {
+                console.error('[v0] Error loading reviews:', error);
+                data.reviews = [];
+                loadReviews();
+            });
+        }
+
+        function saveToFirebase(type, itemData, itemId = null) {
+            if (!database) {
+                console.error('[v0] Firebase not available, cannot save data');
+                alert('Firebase connection failed. Please check your internet connection.');
+                return Promise.reject('Firebase not available');
+            }
+
+            const id = itemId || Date.now().toString();
+            console.log(`[v0] Saving ${type} to Firebase:`, itemData);
+            
+            return database.ref(`${type}s/${id}`).set(itemData)
+                .then(() => {
+                    console.log(`[v0] ${type} saved to Firebase successfully`);
+                    return id;
+                })
+                .catch((error) => {
+                    console.error(`[v0] Error saving ${type} to Firebase:`, error);
+                    alert(`Error saving ${type}: ${error.message}`);
+                    throw error;
+                });
+        }
+
+        function deleteFromFirebase(type, itemId) {
+            if (!database) {
+                console.error('[v0] Firebase not available, cannot delete data');
+                alert('Firebase connection failed. Please check your internet connection.');
+                return Promise.reject('极速电竞 not available');
+            }
+
+            console.log(`[v0] Deleting ${type} from Firebase:`, itemId);
+            
+            return database.ref(`${type}s/${itemId}`).remove()
+                .then(() => {
+                    console.log(`[v0] ${type} deleted from Firebase successfully`);
+                })
+                .catch((error) => {
+                    console.error(`[v0] Error deleting ${type} from Firebase:`, error);
+                    alert(`Error deleting ${type}: ${error.message}`);
+                    throw error;
+                });
+        }
+
+        let data = {
+            videos: [],
+            brokers: [],
+            reviews: []
+        };
+
+        let currentEditingItem = null;
+        let currentEditingType = null;
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-trigger').forEach(trigger => {
+                trigger.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Modal management
+        function openModal(type, item = null) {
+            currentEditingType = type;
+            currentEditingItem = item;
+            
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const formFields = document.getElementById('form-fields');
+            
+            title.textContent = item ? `Edit ${type}` : `Add ${type}`;
+            
+            // Generate form fields based on type
+            formFields.innerHTML = generateFormFields(type, item);
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            currentEditingItem = null;
+            currentEditingType = null;
+        }
+
+        function generateFormFields(type, item) {
+            switch (type) {
+                case 'video':
+                    return `
+                        <div class="form-group">
+                            <label class="label">Title</label>
+                            <input type="text" class="input" name="title" value="${item?.title || ''}" placeholder="Video title" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">YouTube URL</label>
+                            <input type="url" class="input" name="youtubeUrl" value="${item?.youtubeUrl || ''}" placeholder="https://youtube.com/watch?v=..." required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Button Link</label>
+                            <input type="url" class="input" name="buttonLink" value="${item?.buttonLink || ''}" placeholder="https://youtube.com/watch?v=..." required>
+                        </div>
+                    `;
+                case 'broker':
+                    return `
+                        <div class="form-group">
+                            <label class="label">Broker Name</label>
+                            <input type="text" class="input" name="name极速电竞" value="${item?.name || ''}" placeholder="Broker name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Logo URL</label>
+                            <input type="url" class="input" name="logo" value="${item?.logo || ''}" placeholder="https://example.com/logo.png" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Features (comma separated)</label>
+                            <input type="text" class="input" name="features" value="${item?.features?.join(', ') || ''}" placeholder="Feature 1, Feature 2, Feature 3" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Sign Up Link</label>
+                            <input type="url" class="input" name="signUpLink" value="${item?.signUpLink || ''}" placeholder="https://broker.com/signup" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">
+                                <input type="checkbox" name="isActive" ${item?.isActive ? 'checked' : ''}>
+                                Active
+                            </label>
+                        </div>
+                    `;
+                case 'review':
+                    return `
+                        <div class="form-group">
+                            <label class="label">Review Image URL</label>
+                            <input type="url" class="input" name="image" value="${item?.image || ''}" placeholder="https://example.com/review.jpg" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Review Link</label>
+                            <input type="url" class="input" name="reviewLink" value="${item?.reviewLink || ''}" placeholder="https://youtube.com/watch?v=..." required>
+                        </div>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        function saveItem(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(document.getElementById('modal-form'));
+            const itemData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (key === 'features') {
+                    itemData[key] = value.split(',').map(item => item.trim()).filter(item => item);
+                } else if (key === 'isActive') {
+                    itemData[key] = true;
+                } else {
+                    itemData[key] = value;
+                }
+            }
+            
+            // Handle checkbox for isActive
+            if (currentEditingType === 'broker' && !formData.has('isActive')) {
+                itemData.isActive = false;
+            }
+            
+            if (currentEditingItem) {
+                // Edit existing item
+                saveToFirebase(currentEditingType, itemData, currentEditingItem.id)
+                    .then(() => {
+                        loadTabData(currentEditingType + 's');
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error saving item:', error);
+                        alert('Error saving item: ' + error.message);
+                    });
+            } else {
+                // Add new item
+                saveToFirebase(currentEditingType, itemData)
+                    .then((id) => {
+                        loadTabData(currentEditingType + 's');
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error saving item:', error);
+                        alert('Error saving item: ' + error.message);
+                    });
+            }
+        }
+
+        function deleteItem(type, id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                deleteFromFirebase(type, id)
+                    .then(() => {
+                        // Remove from local data
+                        data[type + 's'] = data[type + 's'].filter(item => item.id !== id);
+                        loadTabData(type + 's');
+                    })
+                    .catch(error => {
+                        console.error('Error deleting item:', error);
+                        alert('Error deleting item: ' + error.message);
+                    });
+            }
+        }
+
+        function loadTabData(tabName) {
+            switch (tabName) {
+                case 'videos':
+                    loadVideos();
+                    break;
+                case 'brokers':
+                    loadBrokers();
+                    break;
+                case 'reviews':
+                    loadReviews();
+                    break;
+            }
+        }
+
+        function loadVideos() {
+            const container = document.getElementById('videos-container');
+            
+            if (data.videos.length === 0) {
+                container.innerHTML = `
+                    <div class="item-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📹</div>
+                        <h3 style="margin-bottom: 0.5rem;">No Videos Added</h3>
+                        <p style="color: var(--muted-foreground); margin-bottom: 1rem;">Click "Add Video" to get started.</p>
+                        <button class="btn btn-primary" onclick="openModal('video')">Add First Video</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = data.videos.map(video => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <h3 style="font-weight: 600; font-size: 1.125rem; margin-bottom: 0.5rem;">${video.title || 'Untitled Video'}</h3>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-outline" onclick="openModal('video', ${JSON.stringify(video).replace(/"/g, '&quot;')})">
+                                ✏️
+                            </button>
+                            <button class="btn btn-sm btn-destructive" onclick="deleteItem('video', '${video.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <p style="margin-bottom: 0.5rem;"><strong>YouTube:</strong> ${video.youtubeUrl || 'Not set'}</p>
+                        <p><strong>Button Link:</strong> ${video.buttonLink || 'Not set'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadBrokers() {
+            const container = document.getElementById('brokers-container');
+            
+            if (data.brokers.length === 0) {
+                container.innerHTML = `
+                    <div class="item-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🏢</div>
+                        <h3 style="margin-bottom: 0.5rem;">No Brokers Added</h3>
+                        <p style="color: var(--muted-foreground); margin-bottom: 1rem;">Add up to 4 brokers for your trading platform.</p>
+                        <button class="btn btn-primary" onclick="openModal('broker')">Add First Broker</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = data.brokers.map((broker, index) => `
+                <极速电竞 class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <h3 style="font-weight: 600; font-size: 1.125rem; margin-bottom: 0.5rem;">${broker.name || 'Unnamed Broker'}</h3>
+                            <span class="badge ${broker.isActive ? 'badge-secondary' : 'badge-outline'}">${broker.isActive ? 'Active' : 'Inactive'}</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-outline" onclick="openModal('broker', ${JSON.stringify(broker).replace(/"/g, '&quot;')})">
+                                ✏️
+                            </button>
+                            <button class="btn btn-sm btn-destructive" onclick="deleteItem('broker', '${broker.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <p style="margin-bottom: 0.5rem;"><strong>Logo:</strong> ${broker.logo || 'Not set'}</p>
+                        <p style="margin-bottom: 0.5rem;"><strong>Features:</strong> ${broker.features?.join(', ') || 'None'}</p>
+                        <p><strong>Sign Up Link:</strong> ${broker.signUpLink || 'Not set'}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add empty slots if less than 4 brokers
+            if (data.brokers.length < 4) {
+                container.innerHTML += `
+                    <div class="item-card" style="border: 2px dashed var(--border); text-align: center;">
+                        <div style="padding: 2rem;">
+                            <div style="font-size: 2rem; margin-bottom: 1rem;">➕</div>
+                            <button class="btn btn-outline" onclick="openModal('broker')">Add Broker</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function loadReviews() {
+            const container = document.getElementById('reviews-container');
+            
+            if (data.reviews.length === 0) {
+                container.innerHTML = `
+                    <div class="item-card" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+                        <h3 style="margin-bottom: 0.5rem;">No Reviews Added</h3>
+                        <p style="color: var(--muted-foreground); margin-bottom: 1rem;">Add up to 30 student reviews.</p>
+                        <button class="btn btn-primary" onclick="openModal('review')">Add First Review</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = data.reviews.map(review => `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div>
+                            <h3 style="font-weight: 600; font-size: 1.125rem; margin-bottom: 0.5rem;">Review #${review.id}</h3>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-outline" onclick="openModal('review', ${JSON.stringify(review).replace(/"/g, '&quot;')})">
+                                ✏️
+                            </button>
+                            <button class="btn btn-sm btn-destructive" onclick="deleteItem('review', '${review.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <p style="margin-bottom: 0.5rem;"><strong>Image:</strong> ${review.image || 'Not set'}</p>
+                        <p><strong>Review Link:</strong> ${review.reviewLink || 'Not set'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[v0] Admin panel initializing...');
+            
+            // Check if user is already logged in
+            checkLoginStatus();
+            
+            // Set up form submission handler
+            document.getElementById('modal-form').addEventListener('submit', saveItem);
+        });
+    </script>
+</body>
+</html>
